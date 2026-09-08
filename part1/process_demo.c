@@ -21,18 +21,34 @@ int main(void) {
     }
 
     if (pid == 0) {
-        /* child: attempted "violation" - modify secret and try to disturb the parent */
-        secret = 999;
-        printf("[child]  pid=%d ppid=%d secret=%d addr=%p\n",
+        /* child */
+        printf("[child]  pid=%d ppid=%d secret=%d addr=%p (sleeping 5s - check `ps -f` now)\n",
                getpid(), getppid(), secret, (void *)&secret);
-        kill(getppid(), SIGUSR1); /* memory can't be touched, but signals still cross the boundary */
+        fflush(stdout);
+        sleep(5);
+
+        /* Step 5: attempt to modify the parent's secret using an ordinary pointer.
+         * &secret is the SAME virtual address the parent printed above, so if the
+         * two processes truly shared memory, this write would change the parent's
+         * value too. */
+        int *p = &secret;
+        *p = 999;
+        printf("[child]  after *p=999: pid=%d secret=%d addr=%p\n",
+               getpid(), secret, (void *)&secret);
+        fflush(stdout);
+
+        kill(getppid(), SIGUSR1); /* bonus: memory can't be touched, but signals still cross the boundary */
     } else {
         /* parent */
         signal(SIGUSR1, on_sigusr1);
-        sleep(1); /* let child print/signal first so output stays readable */
-        printf("[parent] pid=%d ppid=%d secret=%d addr=%p signal_from_child=%d\n",
-               getpid(), getppid(), secret, (void *)&secret, got_signal);
-        wait(NULL);
+        printf("[parent] pid=%d ppid=%d secret=%d addr=%p (child now sleeping)\n",
+               getpid(), getppid(), secret, (void *)&secret);
+        fflush(stdout);
+
+        wait(NULL); /* block until child exits */
+
+        printf("[parent] after child exited: pid=%d secret=%d addr=%p signal_from_child=%d\n",
+               getpid(), secret, (void *)&secret, got_signal);
     }
 
     return 0;
