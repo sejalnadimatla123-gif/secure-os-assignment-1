@@ -1,0 +1,13 @@
+=== Process Identity ===
+Real UID:      501
+Effective UID: 501
+Real GID:      20
+Effective GID: 20
+Login name:    user
+
+Attempting to open "/etc/master.passwd" for reading...
+  FAILED: Permission denied (errno 13)
+
+=== Comparison ===
+Identity shown above reflects RUID/EUID 501/501.
+Access to "/etc/master.passwd" succeeds only if EUID/EGID satisfy that file's permission bits.
