@@ -1,0 +1,6 @@
+Read access: Permission denied
+Write access: Permission denied
+Testing file: part2/secret.txt
+
+READ: FAILED
+WRITE: FAILED

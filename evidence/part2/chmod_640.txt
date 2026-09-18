@@ -1,0 +1,4 @@
+Testing file: part2/secret.txt
+
+READ: SUCCESS
+WRITE: SUCCESS
